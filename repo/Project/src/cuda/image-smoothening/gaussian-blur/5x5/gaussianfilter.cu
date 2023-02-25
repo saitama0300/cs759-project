@@ -1,0 +1,276 @@
+#include "gaussianfilter.cuh"
+#include<cstdio>
+
+__global__ void apply_filter(unsigned char* input, unsigned char* output, int height, int width) {
+    extern __shared__ float shared_memory[];
+    float *image = shared_memory;
+
+    int tx = threadIdx.x;
+    int ty = threadIdx.y;
+
+    int im_x = tx+2;
+    int im_y = ty+2;
+
+    int smem_x = (blockDim.x+4);
+    int smem_y = (blockDim.y+4);
+
+    int bx = blockIdx.x;
+    int by = blockIdx.y;
+
+    int thread_idx = bx*blockDim.x+tx;
+    int thread_idy = by*blockDim.y+ty;
+
+    if(tx==0 && ty==0) {
+      
+        for(int i=2;i<smem_x-2;i++){
+          image[NUM_CHANNELS*(i*smem_y+1)] = (by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy-1)])/255;
+          image[NUM_CHANNELS*(i*smem_y+1)+1] = (by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy-1)+1])/255;
+          image[NUM_CHANNELS*(i*smem_y+1)+2] = (by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy-1)+2])/255;
+
+          image[NUM_CHANNELS*(i*smem_y+0)] = (by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy-2)])/255;
+          image[NUM_CHANNELS*(i*smem_y+0)+1] = (by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy-2)+1])/255;
+          image[NUM_CHANNELS*(i*smem_y+0)+2] = (by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy-2)+2])/255;  
+        }
+
+        for(int i=2;i<smem_x-2;i++){
+          image[NUM_CHANNELS*(i*smem_y+smem_x-2)] = (by==(gridDim.y-1)) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy+blockDim.y)])/255;
+          image[NUM_CHANNELS*(i*smem_y+smem_x-2)+1] = (by==(gridDim.y-1)) ? 0 :((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy+blockDim.y)+1])/255;
+          image[NUM_CHANNELS*(i*smem_y+smem_x-2)+2] = (by==(gridDim.y-1)) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy+blockDim.y)+2])/255;
+          
+          image[NUM_CHANNELS*(i*smem_y+smem_x-1)] = (by==(gridDim.y-1)) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy+blockDim.y+1)])/255;
+          image[NUM_CHANNELS*(i*smem_y+smem_x-1)+1] = (by==(gridDim.y-1)) ? 0 :((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy+blockDim.y+1)+1])/255;
+          image[NUM_CHANNELS*(i*smem_y+smem_x-1)+2] = (by==(gridDim.y-1)) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+i-2)*height+thread_idy+blockDim.y+1)+2])/255; 
+        }
+
+        for(int i=2;i<smem_y-2;i++){
+          image[NUM_CHANNELS*(1*smem_y+i)] = (bx==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy+i-2)])/255;
+          image[NUM_CHANNELS*(1*smem_y+i)+1] = (bx==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy+i-2)+1])/255;
+          image[NUM_CHANNELS*(1*smem_y+i)+2] = (bx==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy+i-2)+2])/255;
+          
+          image[NUM_CHANNELS*(0*smem_y+i)] = (bx==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy+i-2)])/255;
+          image[NUM_CHANNELS*(0*smem_y+i)+1] = (bx==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy+i-2)+1])/255;
+          image[NUM_CHANNELS*(0*smem_y+i)+2] = (bx==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy+i-2)+2])/255; 
+        }
+    
+        for(int i=2;i<smem_y-2;i++){
+          image[NUM_CHANNELS*((smem_x-2)*smem_y+i)] = (bx==(gridDim.x-1)) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy+i-2)])/255;
+          image[NUM_CHANNELS*((smem_x-2)*smem_y+i)+1] = (bx==(gridDim.x-1)) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy+i-2)+1])/255;
+          image[NUM_CHANNELS*((smem_x-2)*smem_y+i)+2] = (bx==(gridDim.x-1)) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy+i-2)+2])/255;
+          
+          image[NUM_CHANNELS*((smem_x-1)*smem_y+i)] = (bx==(gridDim.x-1)) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy+i-2)])/255;
+          image[NUM_CHANNELS*((smem_x-1)*smem_y+i)+1] = (bx==(gridDim.x-1)) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy+i-2)+1])/255;
+          image[NUM_CHANNELS*((smem_x-1)*smem_y+i)+2] = (bx==(gridDim.x-1)) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy+i-2)+2])/255; 
+        }
+
+        //(0,0)
+        image[NUM_CHANNELS*((0)*smem_y+0)] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy-2)])/255;
+        image[NUM_CHANNELS*((0)*smem_y+0)+1] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy-2)+1])/255;
+        image[NUM_CHANNELS*((0)*smem_y+0)+2] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy-2)+2])/255;
+
+        image[NUM_CHANNELS*((0)*smem_y+1)] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy-1)])/255;
+        image[NUM_CHANNELS*((0)*smem_y+1)+1] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy-1)+1])/255;
+        image[NUM_CHANNELS*((0)*smem_y+1)+2] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy-1)+2])/255;
+
+        image[NUM_CHANNELS*((1)*smem_y+0)] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy-2)])/255;
+        image[NUM_CHANNELS*((1)*smem_y+0)+1] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy-2)+1])/255;
+        image[NUM_CHANNELS*((1)*smem_y+0)+2] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy-2)+2])/255;
+
+
+        image[NUM_CHANNELS*((1)*smem_y+1)] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy-1)])/255;
+        image[NUM_CHANNELS*((1)*smem_y+1)+1] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy-1)+1])/255;
+        image[NUM_CHANNELS*((1)*smem_y+1)+2] = (bx==0 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy-1)+2])/255;
+        
+        //(0,0)
+        image[NUM_CHANNELS*((0)*smem_y+smem_y-1)] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy+blockDim.y+1)])/255;
+        image[NUM_CHANNELS*((0)*smem_y+smem_y-1)+1] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy+blockDim.y+1)+1])/255;
+        image[NUM_CHANNELS*((0)*smem_y+smem_y-1)+2] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy+blockDim.y+1)+2])/255;
+        
+        image[NUM_CHANNELS*((1)*smem_y+smem_y-1)] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy+blockDim.y+1)])/255;
+        image[NUM_CHANNELS*((1)*smem_y+smem_y-1)+1] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy+blockDim.y+1)+1])/255;
+        image[NUM_CHANNELS*((1)*smem_y+smem_y-1)+2] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy+blockDim.y+1)+2])/255; 
+
+        image[NUM_CHANNELS*((0)*smem_y+smem_y-2)] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy+blockDim.y)])/255;
+        image[NUM_CHANNELS*((0)*smem_y+smem_y-2)+1] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy+blockDim.y)+1])/255;
+        image[NUM_CHANNELS*((0)*smem_y+smem_y-2)+2] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-2)*height+thread_idy+blockDim.y)+2])/255; 
+
+        image[NUM_CHANNELS*((1)*smem_y+smem_y-2)] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy+blockDim.y)])/255;
+        image[NUM_CHANNELS*((1)*smem_y+smem_y-2)+1] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy+blockDim.y)+1])/255;
+        image[NUM_CHANNELS*((1)*smem_y+smem_y-2)+2] = (bx==0 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx-1)*height+thread_idy+blockDim.y)+2])/255; 
+
+        //(0,0)
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+0)] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy-2)])/255;
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+0)+1] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy-2)+1])/255;
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+0)+2] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy-2)+2])/255;
+        
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+1)] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy-1)])/255;
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+1)+1] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy-1)+1])/255;
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+1)+2] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy-1)+2])/255; 
+
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+0)] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy-2)])/255;
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+0)+1] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy-2)+1])/255;
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+0)+2] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy-2)+2])/255; 
+
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+1)] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy-1)])/255;
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+1)+1] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy-1)+1])/255;
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+1)+2] = (bx==gridDim.x-1 || by==0) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy-1)+2])/255; 
+    
+        //(0,0)
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+smem_y-1)] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy+blockDim.y+1)])/255;
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+smem_y-1)+1] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy+blockDim.y+1)+1])/255;
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+smem_y-1)+2] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy+blockDim.y+1)+2])/255; 
+
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+smem_y-2)] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy+blockDim.y)])/255;
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+smem_y-2)+1] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy+blockDim.y)+1])/255;
+        image[NUM_CHANNELS*((smem_x-1)*smem_y+smem_y-2)+2] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x+1)*height+thread_idy+blockDim.y)+2])/255; 
+
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+smem_y-1)] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy+blockDim.y+1)])/255;
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+smem_y-1)+1] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy+blockDim.y+1)+1])/255;
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+smem_y-1)+2] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy+blockDim.y+1)+2])/255; 
+
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+smem_y-2)] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy+blockDim.y)])/255;
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+smem_y-2)+1] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy+blockDim.y)+1])/255;
+        image[NUM_CHANNELS*((smem_x-2)*smem_y+smem_y-2)+2] = (bx==gridDim.x-1 || by==gridDim.y-1) ? 0 : ((float)input[NUM_CHANNELS*((thread_idx+blockDim.x)*height+thread_idy+blockDim.y)+2])/255; 
+    }
+
+    if(thread_idx<width && thread_idy<height){
+        image[NUM_CHANNELS*(im_x*smem_y+im_y)] = ((float)input[NUM_CHANNELS*(thread_idx*height+thread_idy)])/255;
+        image[NUM_CHANNELS*(im_x*smem_y+im_y)+1] = ((float)input[NUM_CHANNELS*(thread_idx*height+thread_idy)+1])/255;
+        image[NUM_CHANNELS*(im_x*smem_y+im_y)+2] = ((float)input[NUM_CHANNELS*(thread_idx*height+thread_idy)+2])/255;    
+    }
+    else{
+        image[NUM_CHANNELS*(im_x*smem_y+im_y)] = 0;
+        image[NUM_CHANNELS*(im_x*smem_y+im_y)+1] = 0;
+        image[NUM_CHANNELS*(im_x*smem_y+im_y)+2] = 0;
+    }
+
+    __syncthreads();
+
+    float r_out=0;
+    float g_out=0;
+    float b_out=0; 
+
+    r_out += 36*image[NUM_CHANNELS*(im_x*smem_y+im_y)];
+    r_out += 24*image[NUM_CHANNELS*(im_x*smem_y+im_y-1)];
+    r_out += 24*image[NUM_CHANNELS*(im_x*smem_y+im_y+1)];
+    r_out += 24*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y)];
+    r_out += 24*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y)];
+    r_out += 16*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y-1)];
+    r_out += 16*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y-1)];
+    r_out += 16*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y+1)];
+    r_out += 16*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y+1)];
+    r_out += 6*image[NUM_CHANNELS*(im_x*smem_y+im_y-2)];
+    r_out += 6*image[NUM_CHANNELS*(im_x*smem_y+im_y+2)];
+    r_out += 6*image[NUM_CHANNELS*((im_x-2)*smem_y+im_y)];
+    r_out += 6*image[NUM_CHANNELS*((im_x+2)*smem_y+im_y)];
+    r_out += image[NUM_CHANNELS*((im_x-2)*smem_y+im_y-2)];
+    r_out += image[NUM_CHANNELS*((im_x+2)*smem_y+im_y-2)];
+    r_out += image[NUM_CHANNELS*((im_x-2)*smem_y+im_y+2)];
+    r_out += image[NUM_CHANNELS*((im_x+2)*smem_y+im_y+2)];
+    r_out += 4*image[NUM_CHANNELS*((im_x-2)*smem_y+im_y-1)];
+    r_out += 4*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y-2)];
+    r_out += 4*image[NUM_CHANNELS*((im_x-2)*smem_y+im_y+1)];
+    r_out += 4*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y+2)];
+    r_out += 4*image[NUM_CHANNELS*((im_x+2)*smem_y+im_y-1)];
+    r_out += 4*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y-2)];
+    r_out += 4*image[NUM_CHANNELS*((im_x+2)*smem_y+im_y+1)];
+    r_out += 4*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y+2)];
+
+    g_out += 36*image[NUM_CHANNELS*(im_x*smem_y+im_y)+1];
+    g_out += 24*image[NUM_CHANNELS*(im_x*smem_y+im_y-1)+1];
+    g_out += 24*image[NUM_CHANNELS*(im_x*smem_y+im_y+1)+1];
+    g_out += 24*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y)+1];
+    g_out += 24*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y)+1];
+    g_out += 16*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y-1)+1];
+    g_out += 16*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y-1)+1];
+    g_out += 16*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y+1)+1];
+    g_out += 16*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y+1)+1];
+    g_out += 6*image[NUM_CHANNELS*(im_x*smem_y+im_y-2)+1];
+    g_out += 6*image[NUM_CHANNELS*(im_x*smem_y+im_y+2)+1];
+    g_out += 6*image[NUM_CHANNELS*((im_x-2)*smem_y+im_y)+1];
+    g_out += 6*image[NUM_CHANNELS*((im_x+2)*smem_y+im_y)+1];
+    g_out += image[NUM_CHANNELS*((im_x-2)*smem_y+im_y-2)+1];
+    g_out += image[NUM_CHANNELS*((im_x+2)*smem_y+im_y-2)+1];
+    g_out += image[NUM_CHANNELS*((im_x-2)*smem_y+im_y+2)+1];
+    g_out += image[NUM_CHANNELS*((im_x+2)*smem_y+im_y+2)+1];
+    g_out += 4*image[NUM_CHANNELS*((im_x-2)*smem_y+im_y-1)+1];
+    g_out += 4*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y-2)+1];
+    g_out += 4*image[NUM_CHANNELS*((im_x-2)*smem_y+im_y+1)+1];
+    g_out += 4*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y+2)+1];
+    g_out += 4*image[NUM_CHANNELS*((im_x+2)*smem_y+im_y-1)+1];
+    g_out += 4*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y-2)+1];
+    g_out += 4*image[NUM_CHANNELS*((im_x+2)*smem_y+im_y+1)+1];
+    g_out += 4*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y+2)+1];
+
+    b_out += 36*image[NUM_CHANNELS*(im_x*smem_y+im_y)+2];
+    b_out += 24*image[NUM_CHANNELS*(im_x*smem_y+im_y-1)+2];
+    b_out += 24*image[NUM_CHANNELS*(im_x*smem_y+im_y+1)+2];
+    b_out += 24*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y)+2];
+    b_out += 24*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y)+2];
+    b_out += 16*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y-1)+2];
+    b_out += 16*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y-1)+2];
+    b_out += 16*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y+1)+2];
+    b_out += 16*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y+1)+2];
+    b_out += 6*image[NUM_CHANNELS*(im_x*smem_y+im_y-2)+2];
+    b_out += 6*image[NUM_CHANNELS*(im_x*smem_y+im_y+2)+2];
+    b_out += 6*image[NUM_CHANNELS*((im_x-2)*smem_y+im_y)+2];
+    b_out += 6*image[NUM_CHANNELS*((im_x+2)*smem_y+im_y)+2];
+    b_out += image[NUM_CHANNELS*((im_x-2)*smem_y+im_y-2)+2];
+    b_out += image[NUM_CHANNELS*((im_x+2)*smem_y+im_y-2)+2];
+    b_out += image[NUM_CHANNELS*((im_x-2)*smem_y+im_y+2)+2];
+    b_out += image[NUM_CHANNELS*((im_x+2)*smem_y+im_y+2)+2];
+    b_out += 4*image[NUM_CHANNELS*((im_x-2)*smem_y+im_y-1)+2];
+    b_out += 4*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y-2)+2];
+    b_out += 4*image[NUM_CHANNELS*((im_x-2)*smem_y+im_y+1)+2];
+    b_out += 4*image[NUM_CHANNELS*((im_x-1)*smem_y+im_y+2)+2];
+    b_out += 4*image[NUM_CHANNELS*((im_x+2)*smem_y+im_y-1)+2];
+    b_out += 4*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y-2)+2];
+    b_out += 4*image[NUM_CHANNELS*((im_x+2)*smem_y+im_y+1)+2];
+    b_out += 4*image[NUM_CHANNELS*((im_x+1)*smem_y+im_y+2)+2];
+
+    r_out /= 256.0;
+    g_out /= 256.0;
+    b_out /= 256.0;
+
+    r_out *= 255.0;
+    g_out *= 255.0;
+    b_out *= 255.0;
+
+    output[NUM_CHANNELS*(thread_idx*height+thread_idy)] = (r_out>255)?255:((unsigned char)r_out);
+    output[NUM_CHANNELS*(thread_idx*height+thread_idy)+1] = (g_out>255)?255:((unsigned char)g_out);
+    output[NUM_CHANNELS*(thread_idx*height+thread_idy)+2] = (b_out>255)?255:((unsigned char)b_out);
+
+}
+
+__host__ void gaussianfilter(unsigned char** rgb_image, unsigned char** output_img, int height, int width, int threads_per_block_dim){
+   dim3 blockSize(threads_per_block_dim,threads_per_block_dim);
+   dim3 gridSize((width+threads_per_block_dim-1)/threads_per_block_dim,(height+threads_per_block_dim-1)/threads_per_block_dim); 
+
+   std::size_t shared_memory = (threads_per_block_dim+4)*(threads_per_block_dim+4)*sizeof(float)*NUM_CHANNELS;
+
+   cudaEvent_t start;
+   cudaEvent_t stop;
+   cudaEventCreate(&start);
+   cudaEventCreate(&stop);
+
+   cudaEventRecord(start); //START EVENT
+
+   // Launch the kernel on the device
+   apply_filter<<<gridSize,blockSize,shared_memory>>>(*(rgb_image),*(output_img),height,width);
+
+   cudaEventRecord(stop); //STOP EVENT
+   cudaEventSynchronize(stop);
+
+   //Calculate total runtime using events
+   float ms;
+   cudaEventElapsedTime(&ms, start, stop);
+
+   printf("Runtime: %f\n", ms); 
+   cudaError_t error = cudaGetLastError();
+    if(error != cudaSuccess)
+    {
+        // print the CUDA error message and exit
+        printf("CUDA error: %s\n", cudaGetErrorString(error));
+
+    }
+    cudaDeviceSynchronize();
+}

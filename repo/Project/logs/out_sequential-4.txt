@@ -1,0 +1,64 @@
+-- GAUSSIAN BLUR -- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 31.8409
+SAVED OUTPUT IMAGE FILE: outputs/sequential/image-smoothening/gaussian-blur/3x3/4.jpg-out.jpg
+
+-- GAUSSIAN BLUR -- 5x5
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 99.7097
+SAVED OUTPUT IMAGE FILE: outputs/sequential/image-smoothening/gaussian-blur/5x5/4.jpg-out.jpg
+
+-- MEDIAN BLUR -- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 55.9126
+SAVED OUTPUT IMAGE FILE: outputs/sequential/image-smoothening/median-blur/3x3/4.jpg-out.jpg
+
+-- MEDIAN BLUR -- 5x5
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 385.078
+SAVED OUTPUT IMAGE FILE: outputs/sequential/image-smoothening/median-blur/5x5/4.jpg-out.jpg
+
+-- NORMALIZED BLUR -- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 26.4121
+SAVED OUTPUT IMAGE FILE: outputs/sequential/image-smoothening/normalized-blur/3x3/4.jpg-out.jpg
+
+-- NORMALIZED BLUR -- 5x5
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 67.2482
+SAVED OUTPUT IMAGE FILE: outputs/sequential/image-smoothening/normalized-blur/5x5/4.jpg-out.jpg
+
+-- SOBEL -- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+CHANNELS OF IMAGE: 3
+Runtime: 53.817
+SAVED OUTPUT IMAGE FILE: outputs/sequential/edge-detection/sobel//4.jpg-out.jpg
+
+-- EROSIN -- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 6.59306
+SAVED OUTPUT IMAGE FILE: outputs/sequential/morphological-operations/erosin//4.jpg-out.jpg
+
+-- DILATION -- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 8.59657
+SAVED OUTPUT IMAGE FILE: outputs/sequential/morphological-operations/dilation//4.jpg-out.jpg
+

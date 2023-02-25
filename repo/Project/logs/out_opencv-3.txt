@@ -1,0 +1,63 @@
+-- GAUSSIAN -- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 1.6245
+SAVED OUTPUT IMAGE FILE: outputs/opencv/image-smoothening/gaussian-blur/3x3/3.jpg-out.jpg
+
+-- GAUSSIAN -- 5x5
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 1.58771
+SAVED OUTPUT IMAGE FILE: outputs/opencv/image-smoothening/gaussian-blur/5x5/3.jpg-out.jpg
+
+-- MEDIAN -- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 0.226458
+SAVED OUTPUT IMAGE FILE: outputs/opencv/image-smoothening/median-blur/3x3/3.jpg-out.jpg
+
+-- MEDIAN -- 5x5
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 1.40471
+SAVED OUTPUT IMAGE FILE: outputs/opencv/image-smoothening/median-blur/5x5/3.jpg-out.jpg
+
+-- NORMALIZED -- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 0.467208
+SAVED OUTPUT IMAGE FILE: outputs/opencv/image-smoothening/normalized-blur/3x3/3.jpg-out.jpg
+
+-- NORMALIZED -- 5x5
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 0.5755
+SAVED OUTPUT IMAGE FILE: outputs/opencv/image-smoothening/normalized-blur/5x5/3.jpg-out.jpg
+
+-- SOBEL -- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 5.64258
+SAVED OUTPUT IMAGE FILE: outputs/opencv/edge-detection/sobel//3.jpg-out.jpg
+
+-- EROSIN -- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 0.136625
+SAVED OUTPUT IMAGE FILE: outputs/opencv/morphological-operations/erosin//3.jpg-out.jpg
+
+-- DILATION -- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 0.171042
+SAVED OUTPUT IMAGE FILE: outputs/opencv/morphological-operations/dilation//3.jpg-out.jpg
+

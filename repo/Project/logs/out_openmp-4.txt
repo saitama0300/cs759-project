@@ -1,0 +1,67 @@
+
+-- GAUSSIAN BLUR -- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 5.89317
+SAVED OUTPUT IMAGE FILE: outputs/openmp/image-smoothening/gaussian-blur/3x3/4.jpg-out.jpg
+
+-- GAUSSIAN BLUR -- 5x5
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 15.8623
+SAVED OUTPUT IMAGE FILE: outputs/openmp/image-smoothening/gaussian-blur/5x5/4.jpg-out.jpg
+
+-- MEDIAN BLUR -- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 7.31201
+SAVED OUTPUT IMAGE FILE: outputs/openmp/image-smoothening/median-blur/3x3/4.jpg-out.jpg
+
+-- MEDIAN BLUR -- 5x5
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 43.1547
+SAVED OUTPUT IMAGE FILE: outputs/openmp/image-smoothening/median-blur/5x5/4.jpg-out.jpg
+
+-- NORMALIZED BLUR -- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 4.68962
+SAVED OUTPUT IMAGE FILE: outputs/openmp/image-smoothening/normalized-blur/3x3/4.jpg-out.jpg
+
+-- NORMALIZED BLUR -- 5x5
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+Runtime: 10.5825
+SAVED OUTPUT IMAGE FILE: outputs/openmp/image-smoothening/normalized-blur/5x5/4.jpg-out.jpg
+
+-- SOBEL -- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+CHANNELS OF IMAGE: 3
+Runtime: 4.70043
+SAVED OUTPUT IMAGE FILE: outputs/openmp/edge-detection/sobel//4.jpg-out.jpg
+
+-- EROSIN- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+CHANNELS OF IMAGE: 3
+Runtime: 1.92763
+SAVED OUTPUT IMAGE FILE: outputs/openmp/morphological-operations/erosin//4.jpg-out.jpg
+
+-- DILATION -- 3x3
+IMAGE FILE: inputs/4.jpg
+WIDTH OF IMAGE: 600
+HEIGHT OF IMAGE: 600
+CHANNELS OF IMAGE: 3
+Runtime: 1.63481
+SAVED OUTPUT IMAGE FILE: outputs/openmp/morphological-operations/dilation//4.jpg-out.jpg
+

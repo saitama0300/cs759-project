@@ -1,0 +1,64 @@
+
+-- GAUSSIAN BLUR -- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 0.956416
+SAVED OUTPUT IMAGE FILE: outputs/cuda/image-smoothening/gaussian-blur/3x3/3.jpg-out.jpg
+
+-- GAUSSIAN BLUR -- 5x5
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 1.258144
+SAVED OUTPUT IMAGE FILE: outputs/cuda/image-smoothening/gaussian-blur/5x5/3.jpg-out.jpg
+
+-- MEDIAN BLUR -- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 0.818496
+SAVED OUTPUT IMAGE FILE: outputs/cuda/image-smoothening/median-blur/3x3/3.jpg-out.jpg
+
+-- MEDIAN BLUR -- 5x5
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 2.798400
+SAVED OUTPUT IMAGE FILE: outputs/cuda/image-smoothening/median-blur/5x5/3.jpg-out.jpg
+
+-- NORMALIZED BLUR -- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 0.982688
+SAVED OUTPUT IMAGE FILE: outputs/cuda/image-smoothening/normalized-blur/3x3/3.jpg-out.jpg
+
+-- NORMALIZED BLUR -- 5x5
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 1.366464
+SAVED OUTPUT IMAGE FILE: outputs/cuda/image-smoothening/normalized-blur/5x5/3.jpg-out.jpg
+
+-- SOBEL -- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 2.083552
+SAVED OUTPUT IMAGE FILE: outputs/cuda/edge-detection/sobel//3.jpg-out.jpg
+
+-- DILATION-- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 0.686432
+SAVED OUTPUT IMAGE FILE: outputs/cuda/morphological-operations/dilation//3.jpg-out.jpg
+
+-- EROSIN-- 3x3
+IMAGE FILE: inputs/3.jpg
+WIDTH OF IMAGE: 512
+HEIGHT OF IMAGE: 512
+Runtime: 0.786784
+SAVED OUTPUT IMAGE FILE: outputs/cuda/morphological-operations/erosin//3.jpg-out.jpg
+
